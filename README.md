@@ -110,7 +110,7 @@ EOF
 | `conform.lua`          | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim) | 代码格式化框架。                              |
 | `indent-blankline`     | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | 缩进线。                                      |
 | `notify.lua`           | [rcarriga/nvim-notify](https://github.com/rcarriga/nvim-notify) | 优化 Neovim 通知体验。                        |
-| `ai-coding.lua`        | [yetone/avante.nvim](https://github.com/yetone/avante.nvim)  | AI 编码助手 (暂未安装)。                      |
+| `ai-coding.lua`        | [github/copilot.vim](https://github.com/github/copilot.vim)  | AI 编码助手 (暂未安装)。                      |
 
 ## :books: 额外的学习资源
 

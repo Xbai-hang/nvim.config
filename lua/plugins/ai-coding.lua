@@ -1,3 +1,5 @@
--- https://github.com/xxx
--- TODO:暂时没找到好用的
-return {}
+-- https://github.com/copilot.vim
+-- NOTE:使用 :Copilot 登录后即可使用
+return {
+    "github/copilot.vim"
+}
