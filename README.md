@@ -2,6 +2,8 @@
 
 个人使用的 Neovim (nvim) 配置文件，基于 **LazyVim** 管理插件。
 
+- **`Neovim` >= 0.10.0**，建议源码编译
+
 ## :rocket: QuickStart
 
 ```bash
