@@ -2,12 +2,8 @@
 -- 语法树解析，语法高亮，textobjects、折叠等功能
 return {
   "nvim-treesitter/nvim-treesitter",
-  lazy = vim.fn.argc(-1) == 0,
+  branch = "master",
   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-  init = function(plugin)
-    require("lazy.core.loader").add_to_rtp(plugin)
-    require("nvim-treesitter.query_predicates")
-  end,
   opts = {
     -- A list of parser names, or "all" (the four listed parsers should always be installed)
     ensure_installed = {
@@ -26,6 +22,7 @@ return {
       "gitattributes",
       "gitignore",
       "diff",
+      "markdown",
       "markdown_inline",
       "vim",
       "vimdoc",
@@ -76,3 +73,4 @@ return {
   end,
   build = ":TSUpdate",
 }
+
