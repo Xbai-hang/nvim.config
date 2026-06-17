@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     pcall(vim.keymap.del, "n", "gra", { buffer = bufnr })
     pcall(vim.keymap.del, "n", "grr", { buffer = bufnr })
     pcall(vim.keymap.del, "n", "gri", { buffer = bufnr })
-    pcall(vim.keymap.del, "n", "gO",  { buffer = bufnr })
+    pcall(vim.keymap.del, "n", "gO", { buffer = bufnr })
   end,
 })
 -- Create new keymapping for lsps
