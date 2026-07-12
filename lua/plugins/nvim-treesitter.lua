@@ -2,7 +2,7 @@
 -- 语法树解析，语法高亮，textobjects、折叠等功能
 return {
   "nvim-treesitter/nvim-treesitter",
-  branch = "master",
+  branch = "main",
   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
   opts = {
     -- A list of parser names, or "all" (the four listed parsers should always be installed)
@@ -29,7 +29,7 @@ return {
     },
     -- Automatically install missing parsers when entering the buffer
     -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-    auto_install = true,
+    auto_install = false,
     highlight = {
       -- Should we enable this module for all supported languages?
       enable = true,
