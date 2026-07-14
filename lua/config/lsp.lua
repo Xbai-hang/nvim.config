@@ -5,8 +5,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     pcall(vim.keymap.del, "n", "grn", { buffer = bufnr })
     pcall(vim.keymap.del, "n", "gra", { buffer = bufnr })
-    pcall(vim.keymap.del, "n", "grr", { buffer = bufnr })
-    pcall(vim.keymap.del, "n", "gri", { buffer = bufnr })
     pcall(vim.keymap.del, "n", "gO", { buffer = bufnr })
   end,
 })
@@ -18,8 +16,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local lsp = vim.lsp
     local bufopts = { noremap = true, silent = true }
 
-    keymap.set("n", "gr", lsp.buf.references, bufopts)
-    keymap.set("n", "gd", lsp.buf.definition, bufopts)
     keymap.set("n", "<space>rn", lsp.buf.rename, bufopts)
     keymap.set("n", "K", lsp.buf.hover, bufopts)
     keymap.set("n", "<space>f", function()
