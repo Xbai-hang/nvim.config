@@ -43,10 +43,6 @@ vim.keymap.set("n", "<A-UP>", "<C-w><C-k>", { desc = "Switch Upper Window" })
 vim.keymap.set("n", "<A-Down>", "<C-w><C-j>", { desc = "Switch Lower Window" })
 vim.keymap.set("n", "<A-Right>", "<C-w><C-l>", { desc = "Switch Right Window" })
 
--- 切换 buffer 快捷键
-vim.keymap.set("n", "<C-h>", ":bprevious<CR>", { desc = "Switch Previous buffer" })
-vim.keymap.set("n", "<C-l>", ":bnext<CR>", { desc = "Switch Next buffer" })
-
 -- insert 模式下，跳到行首行尾
 vim.keymap.set("i", "<C-h>", "<ESC>I", opt)
 vim.keymap.set("i", "<C-l>", "<ESC>A", opt)
