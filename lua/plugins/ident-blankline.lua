@@ -1,38 +1,27 @@
 -- https://github.com/lukas-reineke/indent-blankline.nvim
--- 代码缩进线（纵向）
+-- 显示缩进层级，并突出当前代码作用域。
 return {
   "lukas-reineke/indent-blankline.nvim",
+  -- v3 起插件入口由 indent_blankline 更名为 ibl。
   main = "ibl",
-  event = "VeryLazy", -- 确保插件延迟加载
-  config = function() -- 所有配置必须在此函数内执行
-    -- 全局状态标记（可选改用vim.b本地缓存）
-    vim.g.indent_blankline_visible = true -- 默认开启
-
-    -- 定义切换函数（需要局部函数确保作用域隔离）
-    local function toggle_indent_lines()
-      vim.g.indent_blankline_visible = not vim.g.indent_blankline_visible
-      require("ibl").setup({ -- 需使用插件主模块'ibl'
-        enabled = true,
-        indent = {
-          char = vim.g.indent_blankline_visible and "│" or "",
-        },
-        scope = {
-          show_start = vim.g.indent_blankline_visible,
-          show_end = vim.g.indent_blankline_visible,
-        },
-      })
-      vim.cmd("redraw!")
-    end
-
-    -- 设置快捷键（确保在插件加载后调用）
-    vim.keymap.set("n", "<leader>il", toggle_indent_lines, {
-      desc = "Toggle indent guides",
-    })
-
-    -- 初始化配置，根据全局变量决定是否显示缩进线
-    require("ibl").setup({
-      indent = { char = vim.g.indent_blankline_visible and "│" or "" },
-      scope = { show_start = vim.g.indent_blankline_visible, show_end = vim.g.indent_blankline_visible },
-    })
-  end,
+  event = "VeryLazy",
+  opts = {
+    -- 普通缩进使用较轻的虚线，减少对代码内容的干扰。
+    indent = { char = "┊" },
+    scope = {
+      -- 当前作用域使用实线，与普通缩进形成层级区分。
+      char = "│",
+      -- 绘制作用域首尾横线，帮助识别当前代码块边界。
+      show_start = true,
+      show_end = true,
+    },
+  },
+  keys = {
+    {
+      "<leader>ui",
+      -- 使用插件原生命令真正启用或停用渲染。
+      "<cmd>IBLToggle<cr>",
+      desc = "切换缩进参考线",
+    },
+  },
 }
