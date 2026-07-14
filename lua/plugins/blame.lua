@@ -2,7 +2,7 @@
 -- 逐行查看文件的 Git 归属与历史。
 --
 -- 使用方法：
---   <leader>gB  打开或关闭 Blame 窗口
+--   <leader>gb  打开或关闭 Blame 窗口（Git Blame）
 --
 -- Blame 窗口内：
 --   i       查看当前提交信息
@@ -18,7 +18,7 @@ return {
     lazy = false,
     config = function(_, opts)
       require("blame").setup(opts)
-      vim.keymap.set("n", "<leader>gB", "<cmd>BlameToggle<CR>", { desc = "切换逐行 Git 追溯" })
+      vim.keymap.set("n", "<leader>gb", "<cmd>BlameToggle<CR>", { desc = "切换逐行 Git 追溯" })
     end,
     opts = {
       blame_options = { "-w" },
