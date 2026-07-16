@@ -38,6 +38,7 @@ local function has_file_buffer()
 end
 
 local function update_visibility()
+  -- Bufferline 独占 showtabline：有真实文件时显示，否则隐藏。
   local showtabline = has_file_buffer() and 2 or 0
   if vim.o.showtabline ~= showtabline then
     vim.o.showtabline = showtabline
@@ -103,6 +104,10 @@ return {
         fg = theme_color("TabLineFill", "bg"),
         bg = theme_color("Normal", "bg"),
       },
+      offset_separator = {
+        fg = theme_color("TabLineFill", "bg"),
+        bg = theme_color("NvimTreeNormal", "bg"),
+      },
       close_button = {
         bg = theme_color("NormalFloat", "bg"),
       },
@@ -127,6 +132,14 @@ return {
       themable = false,
       -- 默认逻辑按 listed Buffer 数量判断，无法区分空白 Buffer 与真实文件。
       auto_toggle_bufferline = false,
+      -- 标签从编辑区开始显示；文件树上方保留与侧栏同色的空白占位。
+      offsets = {
+        {
+          filetype = "NvimTree",
+          highlight = "NvimTreeNormal",
+          separator = true,
+        },
+      },
       -- 复用 Snacks，避免 Bufferline 默认的 bdelete! 强制丢弃修改。
       close_command = delete_buffer,
       right_mouse_command = delete_buffer,
@@ -136,6 +149,61 @@ return {
     require("bufferline").setup(opts)
 
     local group = vim.api.nvim_create_augroup("BufferlineVisibility", { clear = true })
+    local render_bufferline = _G.nvim_bufferline
+    local last_file_win = {}
+
+    local function is_file_window(win)
+      if not vim.api.nvim_win_is_valid(win) or vim.api.nvim_win_get_config(win).relative ~= "" then
+        return false
+      end
+
+      local bufnr = vim.api.nvim_win_get_buf(win)
+      return vim.bo[bufnr].buftype == ""
+    end
+
+    local function remember_file_window()
+      local win = vim.api.nvim_get_current_win()
+      if is_file_window(win) then
+        last_file_win[vim.api.nvim_get_current_tabpage()] = win
+      end
+    end
+
+    local function file_window(tabpage)
+      local win = last_file_win[tabpage]
+      if win and is_file_window(win) and vim.api.nvim_win_get_tabpage(win) == tabpage then
+        return win
+      end
+
+      for _, candidate in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
+        if is_file_window(candidate) then
+          last_file_win[tabpage] = candidate
+          return candidate
+        end
+      end
+    end
+
+    -- 聚焦文件树时仍以最后聚焦的文件窗口渲染，保留当前可见文件前的指示条。
+    _G.nvim_bufferline = function()
+      local current_buf = vim.api.nvim_get_current_buf()
+      if vim.bo[current_buf].filetype == "NvimTree" then
+        local win = file_window(vim.api.nvim_get_current_tabpage())
+        if win then
+          return vim.api.nvim_win_call(win, render_bufferline)
+        end
+      end
+
+      return render_bufferline()
+    end
+
+    vim.api.nvim_create_autocmd("WinEnter", {
+      group = group,
+      desc = "记录最后聚焦的文件窗口",
+      callback = function()
+        remember_file_window()
+        vim.schedule(vim.cmd.redrawtabline)
+      end,
+    })
+
     vim.api.nvim_create_autocmd(
       { "BufAdd", "BufDelete", "BufEnter", "BufFilePost", "BufModifiedSet", "TextChanged", "TextChangedI" },
       {
@@ -148,7 +216,8 @@ return {
       }
     )
 
-    -- 在 Snacks dashboard 保存 showtabline 状态前隐藏空白启动栏。
+    -- 初始化可见性，后续由上方自动命令持续同步。
+    remember_file_window()
     update_visibility()
   end,
 }
