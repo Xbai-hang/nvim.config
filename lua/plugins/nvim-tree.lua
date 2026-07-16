@@ -69,5 +69,19 @@ return {
   },
   config = function(_, opts)
     require("nvim-tree").setup(opts)
+
+    local api = require("nvim-tree.api")
+    local event = api.events.Event
+
+    -- 文件树改变窗口布局后，重新计算仍然打开的 Dashboard 位置。
+    local function refresh_dashboard()
+      vim.schedule(function()
+        require("snacks").dashboard.update()
+      end)
+    end
+
+    api.events.subscribe(event.TreeOpen, refresh_dashboard)
+    api.events.subscribe(event.TreeClose, refresh_dashboard)
+    api.events.subscribe(event.Resize, refresh_dashboard)
   end,
 }
