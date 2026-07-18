@@ -1,11 +1,4 @@
--- src: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ty.lua
+-- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ty.lua
+-- ty：Python；Mason 安装，lua/config/lsp.lua 启用。
 ---@type vim.lsp.Config
-return {
-  cmd = { "ty", "server" },
-  filetypes = { "python" },
-  root_markers = {
-    "ty.toml",
-    "pyproject.toml",
-    ".git",
-  },
-}
+return {}
