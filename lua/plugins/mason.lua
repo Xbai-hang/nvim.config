@@ -16,9 +16,15 @@ return {
   },
   opts = {
     ensure_installed = {
+      "bashls",
+      "docker_language_server",
       "gopls",
+      "jsonls",
       "lua_ls",
+      "marksman",
+      "taplo",
       "ty",
+      "yamlls",
     },
     -- Mason 只负责安装，启用列表由 vim.lsp.enable() 统一维护。
     automatic_enable = false,

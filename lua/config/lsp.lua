@@ -31,7 +31,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 -- 启用 lsp
 vim.lsp.enable({
+  "bashls",
+  "docker_language_server",
   "gopls",
+  "jsonls",
   "lua_ls",
+  "marksman",
+  "taplo",
   "ty",
+  "yamlls",
 })
