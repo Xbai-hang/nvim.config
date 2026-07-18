@@ -1,48 +1,31 @@
--- Remove global default key mapping
+-- LSP 连接当前 Buffer 后再创建专属快捷键，避免占用普通文件的按键。
+local lsp_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
+
 vim.api.nvim_create_autocmd("LspAttach", {
+  group = lsp_group,
+  desc = "创建当前 Buffer 的 LSP 快捷键",
   callback = function(args)
+    local lsp = vim.lsp
     local bufnr = args.buf
 
-    pcall(vim.keymap.del, "n", "grn", { buffer = bufnr })
-    pcall(vim.keymap.del, "n", "gra", { buffer = bufnr })
-    pcall(vim.keymap.del, "n", "gO", { buffer = bufnr })
-  end,
-})
--- Create new keymapping for lsps
--- LspAttach: After an LSP Client performs "initialize" and attaches to a buffer.
-vim.api.nvim_create_autocmd("LspAttach", {
-  callback = function(args)
-    local keymap = vim.keymap
-    local lsp = vim.lsp
-    local bufopts = { noremap = true, silent = true }
+    local function map(lhs, rhs, desc)
+      vim.keymap.set("n", lhs, rhs, {
+        buffer = bufnr,
+        noremap = true,
+        silent = true,
+        desc = desc,
+      })
+    end
 
-    keymap.set("n", "<space>rn", lsp.buf.rename, bufopts)
-    keymap.set("n", "K", lsp.buf.hover, bufopts)
-    keymap.set("n", "<space>f", function()
-      require("conform").format({ async = true, lsp_fallback = true })
-    end, bufopts)
-  end,
-})
-
--- CursorHold: When the user doesn't press a key for the time specified with 'updatetime'
---             By default, `updatetime` is equal to 4000 ms
-vim.api.nvim_create_autocmd("CursorHold", {
-  callback = function()
-    vim.diagnostic.open_float(nil, { focusable = false, source = "if_many" })
-  end,
-})
-
--- 自动格式化 go 代码
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.go",
-  callback = function()
-    vim.lsp.buf.format({
-      async = false,
-      timeout_ms = 5000,
-      filter = function(client)
-        return client.name == "gopls"
-      end,
-    })
+    map("<leader>rn", lsp.buf.rename, "重命名符号（LSP）")
+    map("K", lsp.buf.hover, "显示悬浮文档（LSP）")
+    map("<leader>ld", function()
+      vim.diagnostic.open_float({
+        focusable = true,
+        source = "if_many",
+        border = "rounded",
+      })
+    end, "查看当前行诊断（Diagnostics）")
   end,
 })
 
