@@ -14,9 +14,12 @@ return {
       { "<leader>fz", group = "模糊查找（FzfLua）" },
       { "<leader>g", group = "Git 操作" },
       { "<leader>gh", group = "Git 变更块（Hunk）" },
+      { "<leader>l", group = "LSP 操作" },
       { "<leader>n", group = "通知（Notifications）" },
       { "<leader>ot", group = "终端（Terminal）" },
       { "<leader>u", group = "功能开关" },
+      { "<leader>w", group = "窗口操作（Window）" },
+      { "z", group = "代码折叠" },
     },
   },
   keys = {

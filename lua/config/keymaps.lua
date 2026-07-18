@@ -1,73 +1,66 @@
--- 复用 opt 参数
-local opt = {
-  noremap = true, -- non-recursive
-  silent = true, -- show message
-}
+local function map(mode, lhs, rhs, desc, opts)
+  opts = vim.tbl_extend("force", { noremap = true, silent = true, desc = desc }, opts or {})
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
 
--- 基础操作
-vim.keymap.set("n", "<leader>p", ":set invpaste paste?<CR>", opt) -- 格式化文件中所有代码行（nvim-treesitter 代码格式化）
-
-vim.keymap.set("n", "<leader>t", "gg=G", opt) -- 格式化文件中所有代码行（nvim-treesitter 代码格式化）
-
-vim.keymap.set("i", "jk", "<ESC>", { desc = "Leave Insert mode" }) -- 退出 insert 模式
-
--- 显示行号
-vim.keymap.set("n", "<leader><leader>", function()
+-- 基础编辑
+map("i", "jk", "<ESC>", "退出插入模式")
+map("n", "<leader>ul", function()
   vim.wo.number = not vim.wo.number
-end, { desc = "Toggle line numbers" })
+end, "打开/关闭行号显示")
+map("n", "<leader>uw", function()
+  vim.wo.list = not vim.wo.list
+end, "显示/隐藏空白字符（Whitespace）")
+map("n", "<leader>uW", function()
+  local enabled = not vim.wo.wrap
+  vim.wo.wrap = enabled
+  vim.b.wrap_override = enabled
+end, "打开/关闭自动折行（Wrap）")
+map("n", "<ESC>", vim.cmd.nohlsearch, "清除搜索高亮")
+map({ "x", "n", "s" }, "<C-q>", vim.cmd.quit, "退出当前窗口")
+map({ "i", "x", "n", "s" }, "<C-s>", "<Esc><Cmd>write<CR>", "保存文件并返回普通模式")
+map("n", "j", function()
+  return vim.v.count == 0 and "gj" or "j"
+end, "向下移动一个显示行", { expr = true })
+map("n", "k", function()
+  return vim.v.count == 0 and "gk" or "k"
+end, "向上移动一个显示行", { expr = true })
 
--- 替代 gcc 的快捷键
--- vim.keymap.set("n", "<leader>c", "gcc", { noremap = true, silent = true })
--- 替代 gc% 的快捷键
--- vim.keymap.set("n", "<leader>cc", "gc%", { noremap = true, silent = true })
+-- 窗口与 Buffer
+map("n", "<leader>wv", "<Cmd>vsplit<CR>", "左右分屏")
+map("n", "<leader>wh", "<Cmd>split<CR>", "上下分屏")
+map("n", "<leader>wc", "<C-w>c", "关闭当前窗口")
+map("n", "<leader>wo", "<C-w>o", "只保留当前窗口")
+map("n", "<leader>we", "<C-w>=", "均衡窗口尺寸")
+map("n", "<leader>ww", "<C-w>w", "切换到下一个窗口")
+-- 移动当前窗口位置可使用 Neovim 原生 <C-w>H/J/K/L。
 
--- 窗口操作
--- 取消 s 默认功能
-vim.keymap.set("n", "s", "", opt)
+map("n", "<C-Up>", ":resize -2<CR>", "减小窗口高度")
+map("n", "<C-Down>", ":resize +2<CR>", "增加窗口高度")
+map("n", "<C-Left>", ":vertical resize -2<CR>", "减小窗口宽度")
+map("n", "<C-Right>", ":vertical resize +2<CR>", "增加窗口宽度")
 
--- windows 分屏快捷键
-vim.keymap.set("n", "sv", ":vsp<CR>", opt)
-vim.keymap.set("n", "sh", ":sp<CR>", opt)
-vim.keymap.set("n", "sc", "<C-w>c", opt) -- 关闭当前
-vim.keymap.set("n", "so", "<C-w>o", opt) -- 关闭其他
+-- 普通窗口和终端窗口共用导航键，无需先退出终端输入模式。
+map({ "n", "t" }, "<A-Left>", "<Cmd>wincmd h<CR>", "切换到左侧窗口")
+map({ "n", "t" }, "<A-Up>", "<Cmd>wincmd k<CR>", "切换到上方窗口")
+map({ "n", "t" }, "<A-Down>", "<Cmd>wincmd j<CR>", "切换到下方窗口")
+map({ "n", "t" }, "<A-Right>", "<Cmd>wincmd l<CR>", "切换到右侧窗口")
+map("n", "<C-a>", "^", "跳转到首个非空字符")
+map("n", "<C-e>", "$", "跳转到行尾")
+map("i", "<C-a>", "<C-o>^", "跳转到首个非空字符")
+map("i", "<C-e>", "<C-o>$", "跳转到行尾")
 
--- 更改窗口大小
-vim.keymap.set("n", "<C-Up>", ":resize -2<CR>") -- Ctrl+上：窗口高度减小 2 行
-vim.keymap.set("n", "<C-Down>", ":resize +2<CR>") -- Ctrl+下：窗口高度增加 2 行
-vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>") -- Ctrl+左：窗口宽度减小 2 列
-vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>") -- Ctrl+右：窗口宽度增加 2 列
+-- Visual 模式：操作后保留选区，便于连续调整。
+map("x", "<", "<gv", "减少缩进并保持选区")
+map("x", ">", ">gv", "增加缩进并保持选区")
+map("x", "K", ":move '<-2<CR>gv=gv", "向上移动选中行并重新缩进")
+map("x", "J", ":move '>+1<CR>gv=gv", "向下移动选中行并重新缩进")
 
--- 简化窗口跳转快捷键
-vim.keymap.set("n", "<A-Left>", "<C-w><C-h>", { desc = "Switch Left Window" })
-vim.keymap.set("n", "<A-UP>", "<C-w><C-k>", { desc = "Switch Upper Window" })
-vim.keymap.set("n", "<A-Down>", "<C-w><C-j>", { desc = "Switch Lower Window" })
-vim.keymap.set("n", "<A-Right>", "<C-w><C-l>", { desc = "Switch Right Window" })
-
--- insert 模式下，跳到行首行尾
-vim.keymap.set("i", "<C-h>", "<ESC>I", opt)
-vim.keymap.set("i", "<C-l>", "<ESC>A", opt)
-
--- Visual 模式下：增强缩进体验
-vim.keymap.set("v", "<", "<gv", opts)
-vim.keymap.set("v", ">", ">gv", opts)
--- Visual 模式下：上下移动选中文本
-vim.keymap.set("v", "K", ":move '<-2<CR>gv-gv", opt)
-vim.keymap.set("v", "J", ":move '>+1<CR>gv-gv", opt)
-
--- 清除高亮
-vim.keymap.set("n", "<ESC>", vim.cmd.nohlsearch, { desc = "Clear Highlights" })
-
--- 简化退出、保存文件
-vim.keymap.set({ "i", "x", "n", "s" }, "<C-q>", vim.cmd.quit, { desc = "Quit File" })
-vim.keymap.set({ "i", "x", "n", "s" }, "<C-s>", vim.cmd.write, { desc = "Save File" })
-
--- Go IDE
-vim.keymap.set("n", "fe", ":GoIfErr<CR>", { desc = "Fill Struct in Go" })
-vim.keymap.set("n", "fs", ":GoFillStruct<CR>", { desc = "Fill Struct in Go" })
-vim.keymap.set("n", "<leader>fc", ":GoFillSwitch<CR>", { desc = "Fill Struct in Go" })
-vim.keymap.set("n", "<leader>ta", ":GoAddTag<CR>", { desc = "Append Struct Tag in Go" })
-vim.keymap.set("n", "<leader>tr", ":GoRmTag<CR>", { desc = "Remove Struct Tag in Go" })
-vim.keymap.set("n", "<leader>tc", ":GoClearTag<CR>", { desc = "Clear Struct Tag in Go" })
-vim.keymap.set("n", "<leader>i", ":GoImports<CR>", { desc = "Go imports" })
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+-- 代码折叠：沿用 Neovim 原生 z 前缀，并补充描述供 WhichKey 展示。
+map("n", "za", "za", "切换当前折叠")
+map("n", "zo", "zo", "展开当前折叠")
+map("n", "zO", "zO", "递归展开当前折叠")
+map("n", "zc", "zc", "折叠当前区域")
+map("n", "zC", "zC", "递归折叠当前区域")
+map("n", "zR", "zR", "展开全部折叠")
+map("n", "zM", "zM", "折叠全部区域")
