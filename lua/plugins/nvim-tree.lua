@@ -73,9 +73,31 @@ return {
     local api = require("nvim-tree.api")
     local event = api.events.Event
 
-    -- 文件树改变窗口布局后，重新计算仍然打开的 Dashboard 位置。
+    -- TreeOpen/TreeClose 常与 Resize 连续触发；合并到同一轮调度，避免
+    -- Dashboard 先按旧视口重绘一帧，再回到左上角。
+    local refresh_pending = false
+
+    local function reset_dashboard_view()
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == "snacks_dashboard" then
+          vim.api.nvim_win_call(win, function()
+            vim.fn.winrestview({ leftcol = 0, topline = 1 })
+          end)
+        end
+      end
+    end
+
+    -- 文件树改变窗口布局后，重新计算 Dashboard，并清除 Neovim 为保持
+    -- 旧光标可见而留下的水平/垂直视口偏移。
     local function refresh_dashboard()
+      if refresh_pending then
+        return
+      end
+      refresh_pending = true
       vim.schedule(function()
+        refresh_pending = false
+        reset_dashboard_view()
         require("snacks").dashboard.update()
       end)
     end
